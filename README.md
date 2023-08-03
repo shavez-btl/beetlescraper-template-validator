@@ -1,0 +1,1 @@
+# beetlescraper-template-validator
