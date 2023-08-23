@@ -3,12 +3,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  ecr:
-    # In this section you can define images that will be built locally and uploaded to ECR
-    images: 
-      bts_validator_container:
-        path: ./
-  # runtime: python3.9
+  runtime: python3.9
   stage: dev
   region: ap-south-1
   versionFunctions: false
@@ -18,11 +13,13 @@ provider:
 
 functions:
   app:
-    image:
-      name: bts_validator_container
+    handler: handler.app
 
 package:
   patterns:
     - '!venv/**'
     - '!__pycache__/**'
     - '!node_modules/**'
+
+plugins:
+  - serverless-python-requirements
