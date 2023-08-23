@@ -20,6 +20,6 @@ var/
 .serverless
 
 venv/
-node-modules/
+node_modules/
 __pycache__/
 config/
