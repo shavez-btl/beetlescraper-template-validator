@@ -1,7 +1,7 @@
 from constants import BEETLE_SCRAPER_ENDPOINT
 import requests
 import json
-from datetime import date
+from datetime import date,datetime
 
 #extract all keys in fields in userScraper Yaml Data
 def extractAllFields(yamlData):
@@ -29,7 +29,62 @@ def getAllJobs():
     response = requests.post(url, headers=headers, data=payload)
     return response
 
-#mark a teamplate in review status
+#create userScrapers from templates
+def createJobs(scraperId,scraperUrl):
+    url = BEETLE_SCRAPER_ENDPOINT+"jobConfig/createJobConfig"
+    payload = json.dumps({
+        "jobName": "Test Job",
+        "userScraperId": scraperId,
+        "jobType": "ADHOC",
+        "targetUrl": scraperUrl
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(url, headers=headers, data=payload)
+    return response
+
+#create userScrapers from templates
+def createUserScrapers(id,name,templateUrl):
+    url = BEETLE_SCRAPER_ENDPOINT+"scrapertemplate/useTemplate"
+    payload = json.dumps({
+        "templateId": id,
+        "templateName": name + ' ' +str(datetime.now()),
+        "templateGroupId": 1,
+        "templateGroupName": "MHS",
+        "scraperUrl": templateUrl
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(url, headers=headers, data=payload)
+    return response
+
+#fetch all templates
+def getAllTemplates():
+    url = BEETLE_SCRAPER_ENDPOINT+"scrapertemplate/?size=25"
+    response = requests.get(url)
+    return response
+
+#fetch all userScarpers
+def getAllScrapers():
+    url = BEETLE_SCRAPER_ENDPOINT+"userScraper/"
+    response = requests.get(url)
+    return response
+
+#mark a scraper as DELETED
+def markAsDeleted(scraperId):
+    url = BEETLE_SCRAPER_ENDPOINT+"userScraper/patchUserScraper/"+str(scraperId)
+    payload = json.dumps({
+        "status": "DELETED"
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.patch(url, headers=headers, data=payload)
+    print(response.text)
+
+#mark a template in review status
 def markAsReview():
     url = BEETLE_SCRAPER_ENDPOINT+"scrapertemplate/markAsReview/2"
     response = requests.patch(url)
