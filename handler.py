@@ -1,9 +1,25 @@
 import json
-from utils import yamlDownload, scrapedDataDownload, getAllJobs, extractAllFields, markAsReview
+from utils import createJobs, createUserScrapers, getAllTemplates, yamlDownload, scrapedDataDownload, getAllJobs, extractAllFields, markAsReview
 
 def scraperValidation(event, context):
+    # templatesResp=getAllTemplates()
+    # templatesRespObject=json.loads(templatesResp.text)
+    # # print(templatesRespObject['response']['content'])
+    # print(len(templatesRespObject['response']['content']))
+    # userScraperList=[]
+    # for template in templatesRespObject['response']['content']:
+    #     if template['status']=='ACTIVE':
+    #         userScraperResp=createUserScrapers(template['id'],template['name'],template['templateUrl'])
+    #         userScraperRespObject=json.loads(userScraperResp.text)
+    #         userScraperList.append(userScraperRespObject['_embedded']['userScraperResponseModels'][0])
+    # print(len(userScraperList))
+    # print(userScraperList)
+    # for scrapers in userScraperList:
+    #     createJobs(scrapers['id'],scrapers['scraperUrl'])
     resp=getAllJobs()
     json_object = json.loads(resp.text)
+    print(json_object)
+    scrapedDataJson={}
     print(len(json_object['response']['content']))
     for job in json_object['response']['content']:
         print(job['jobConfigJobName'])
@@ -15,16 +31,16 @@ def scraperValidation(event, context):
         if len(scrapedData.text)>0:
             scrapedDataJson=json.loads(scrapedData.text)
             print(list(scrapedDataJson['data'].keys()))
+            compareResult=compareKeys(list(scrapedDataJson['data'].keys()),extractedFields) #checking if keys are same for userScraper yaml data & scraped data for a job
+            if compareResult:
+                if checkNullValues(scrapedDataJson['data']): #checking if scraped data has null values
+                    print("Valid")
+                else:
+                    print("Invalid...Mark As Review")
+            else:
+                print("Invalid!!!  Mark As Review")
         else:
             print("No Data!!!")
-        compareResult=compareKeys(list(scrapedDataJson['data'].keys()),extractedFields) #checking if keys are same for userScraper yaml data & scraped data for a job
-        if compareResult:
-            if checkNullValues(scrapedDataJson['data']): #checking if scraped data has null values
-                print("Valid")
-            else:
-                print("Invalid...Mark As Review")
-        else:
-            print("Invalid!!!  Mark As Review")
 
 def compareKeys(scrapedKeys, yamlKeys):
     scrapedKeys.sort()
@@ -41,7 +57,7 @@ def checkNullValues(scrapedData):
             return False
     return True
 
-def app(event, context):
+def validator(event, context):
     scraperValidation({},{})
     body = {
         "message": "Go Serverless v3.0! Your function executed successfully!",
@@ -51,4 +67,4 @@ def app(event, context):
 
     return response
 
-# hello({},{})
+validator({},{})

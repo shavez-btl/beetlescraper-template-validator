@@ -12,9 +12,10 @@ provider:
     BEETLE_SCRAPER_ENDPOINT: ${file(./config/config.${opt:stage, 'dev'}.json):BEETLE_SCRAPER_ENDPOINT}
 
 functions:
-  app:
-    handler: handler.app
-
+  validator:
+    handler: handler.validator
+  scraperJobRunner:
+    handler: job-runner.jobRunner
 package:
   patterns:
     - '!venv/**'
