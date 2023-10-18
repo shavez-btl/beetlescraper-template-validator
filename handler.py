@@ -1,7 +1,7 @@
 import json
-from utils import createJobs, createUserScrapers, getAllTemplates, yamlDownload, scrapedDataDownload, getAllJobs, extractAllFields, markAsReview
+from utils import yamlDownload, scrapedDataDownload, getAllJobs, extractAllFields, run
 
-def scraperValidation(event, context):
+def scraperValidation(event, context, token):
     # templatesResp=getAllTemplates()
     # templatesRespObject=json.loads(templatesResp.text)
     # # print(templatesRespObject['response']['content'])
@@ -16,18 +16,19 @@ def scraperValidation(event, context):
     # print(userScraperList)
     # for scrapers in userScraperList:
     #     createJobs(scrapers['id'],scrapers['scraperUrl'])
-    resp=getAllJobs()
+    print(token)
+    resp=getAllJobs(token)
     json_object = json.loads(resp.text)
     print(json_object)
     scrapedDataJson={}
     print(len(json_object['response']['content']))
     for job in json_object['response']['content']:
         print(job['jobConfigJobName'])
-        yamlData=yamlDownload(job['userScraperId'])
+        yamlData=yamlDownload(job['userScraperId'],token)
         yamlDataJson=json.loads(yamlData.text)
         extractedFields=extractAllFields(yamlDataJson['fields']) #extracting all they keys of userScraper yaml data
         print(extractedFields)
-        scrapedData=scrapedDataDownload(job['userScraperId'], job['id'])
+        scrapedData=scrapedDataDownload(job['userScraperId'], job['id'],token)
         if len(scrapedData.text)>0:
             scrapedDataJson=json.loads(scrapedData.text)
             print(list(scrapedDataJson['data'].keys()))
@@ -58,7 +59,8 @@ def checkNullValues(scrapedData):
     return True
 
 def validator(event, context):
-    scraperValidation({},{})
+    token=run({},{})
+    scraperValidation({},{},token)
     body = {
         "message": "Go Serverless v3.0! Your function executed successfully!",
         "input": event,

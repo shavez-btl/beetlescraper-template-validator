@@ -14,6 +14,11 @@ provider:
 functions:
   validator:
     handler: handler.validator
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - lambda:InvokeFunction        
+        Resource: "arn:aws:lambda:ap-south-1:086598438458:function:beetlescraper-auth-services-qa-credProvider"
   scraperJobRunner:
     handler: job-runner.jobRunner
 package:
@@ -24,3 +29,4 @@ package:
 
 plugins:
   - serverless-python-requirements
+  - serverless-iam-roles-per-function
